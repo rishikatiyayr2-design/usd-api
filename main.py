@@ -35,7 +35,17 @@ def home():
             params=params
         ).json()
 
-        txs = response["result"]
+        txs = response.get(
+            "result",
+            []
+        )
+
+        # API error handling
+        if not isinstance(txs, list):
+
+            return {
+                "error": "BscScan API limit hit or invalid response"
+            }
 
         final_tx = None
 
@@ -45,8 +55,8 @@ def home():
                 tx["value"]
             ) / 1000000000000000000
 
-            # 5 se 500 USDT only
-            if amount >= 5 and amount <= 500:
+            # 1 to 30 USDT only
+            if amount >= 1 and amount <= 30:
 
                 final_tx = tx
 
@@ -80,15 +90,11 @@ def home():
 
         return {
 
-            "user_id": str(user_id),
-
             "amount": str(amount),
 
             "wallet": wallet,
 
             "hash": hash_value,
-
-            "bot": "@YourBot"
 
         }
 
