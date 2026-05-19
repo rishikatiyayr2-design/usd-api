@@ -41,7 +41,7 @@ def home():
             ):
 
                 amount = float(
-                    tx["contractData"]["amount"]
+                    tx.get("amount",0)
                 ) / 1000000
 
                 # 0.5 se 20 USDT only
@@ -64,7 +64,7 @@ def home():
         amount = round(
 
             float(
-                final_tx["contractData"]["amount"]
+                final_tx.get("amount",0)
             ) / 1000000,
 
             2
