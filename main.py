@@ -1,6 +1,5 @@
 from flask import Flask
 import requests
-import random
 
 app = Flask(__name__)
 
@@ -12,39 +11,19 @@ def home():
 
     try:
 
-        url = "https://api.bscscan.com/api"
+        url = "https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=0x55d398326f99059fF775485246999027B3197955&page=1&offset=50&sort=desc"
 
-        params = {
-
-            "module": "account",
-
-            "action": "tokentx",
-
-            "contractaddress": USDT_CONTRACT,
-
-            "page": 1,
-
-            "offset": 50,
-
-            "sort": "desc"
-
-        }
-
-        response = requests.get(
-            url,
-            params=params
-        ).json()
+        response = requests.get(url).json()
 
         txs = response.get(
             "result",
             []
         )
 
-        # API error handling
         if not isinstance(txs, list):
 
             return {
-                "error": "BscScan API limit hit or invalid response"
+                "error": "BscScan API blocked"
             }
 
         final_tx = None
@@ -80,21 +59,13 @@ def home():
 
         )
 
-        user_id = random.randint(
-
-            100000,
-
-            999999
-
-        )
-
         return {
 
             "amount": str(amount),
 
             "wallet": wallet,
 
-            "hash": hash_value,
+            "hash": hash_value
 
         }
 
