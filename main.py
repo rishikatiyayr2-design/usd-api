@@ -3,6 +3,8 @@ import requests
 
 app = Flask(__name__)
 
+API_KEY = "jvI5VOeaDfaUooXAuckB5"
+
 USDT_CONTRACT = "0x55d398326f99059fF775485246999027B3197955"
 
 
@@ -11,9 +13,30 @@ def home():
 
     try:
 
-        url = "https://api.bscscan.com/api?module=account&action=tokentx&contractaddress=0x55d398326f99059fF775485246999027B3197955&page=1&offset=50&sort=desc"
+        url = "https://api.bscscan.com/api"
 
-        response = requests.get(url).json()
+        params = {
+
+            "module": "account",
+
+            "action": "tokentx",
+
+            "contractaddress": USDT_CONTRACT,
+
+            "page": 1,
+
+            "offset": 50,
+
+            "sort": "desc",
+
+            "apikey": API_KEY
+
+        }
+
+        response = requests.get(
+            url,
+            params=params
+        ).json()
 
         txs = response.get(
             "result",
@@ -23,7 +46,7 @@ def home():
         if not isinstance(txs, list):
 
             return {
-                "error": "BscScan API blocked"
+                "error": "Invalid API response"
             }
 
         final_tx = None
