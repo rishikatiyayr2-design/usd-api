@@ -17,7 +17,7 @@ def home():
 
             "count": "true",
 
-            "limit": 50,
+            "limit": 200,
 
             "start": 0
 
