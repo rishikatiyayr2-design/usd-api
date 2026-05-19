@@ -3,33 +3,23 @@ import requests
 
 app = Flask(__name__)
 
-API_KEY = "jvI5VOeaDfaUooXAuckB5"
-
-USDT_CONTRACT = "0x55d398326f99059fF775485246999027B3197955"
-
 
 @app.route("/")
 def home():
 
     try:
 
-        url = "https://api.bscscan.com/api"
+        url = "https://apilist.tronscanapi.com/api/transaction"
 
         params = {
 
-            "module": "account",
+            "sort": "-timestamp",
 
-            "action": "tokentx",
+            "count": "true",
 
-            "contractaddress": USDT_CONTRACT,
+            "limit": 50,
 
-            "page": 1,
-
-            "offset": 50,
-
-            "sort": "desc",
-
-            "apikey": API_KEY
+            "start": 0
 
         }
 
@@ -38,31 +28,28 @@ def home():
             params=params
         ).json()
 
-        txs = response.get(
-            "result",
-            []
-        )
-
-        if not isinstance(txs, list):
-
-            return {
-                "error": "Invalid API response"
-            }
+        txs = response["data"]
 
         final_tx = None
 
         for tx in txs:
 
-            amount = float(
-                tx["value"]
-            ) / 1000000000000000000
+            # Sirf USDT TRC20 transfer
+            if (
+                tx.get("contractType") == 31
+                and tx.get("tokenInfo", {}).get("tokenAbbr") == "USDT"
+            ):
 
-            # 1 to 30 USDT only
-            if amount >= 1 and amount <= 30:
+                amount = float(
+                    tx["contractData"]["amount"]
+                ) / 1000000
 
-                final_tx = tx
+                # 0.5 se 20 USDT only
+                if amount >= 0.5 and amount <= 20:
 
-                break
+                    final_tx = tx
+
+                    break
 
         if not final_tx:
 
@@ -72,11 +59,13 @@ def home():
 
         hash_value = final_tx["hash"]
 
-        wallet = final_tx["to"]
+        wallet = final_tx["toAddress"]
 
         amount = round(
 
-            float(final_tx["value"]) / 1000000000000000000,
+            float(
+                final_tx["contractData"]["amount"]
+            ) / 1000000,
 
             2
 
@@ -104,9 +93,6 @@ def home():
 if __name__ == "__main__":
 
     app.run(
-
         host="0.0.0.0",
-
         port=10000
-
     )
